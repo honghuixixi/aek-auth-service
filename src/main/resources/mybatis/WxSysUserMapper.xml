@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aek56.microservice.auth.mapper.WxSysUserMapper">
+
+
+	<!-- 通用查询映射结果 -->
+	<resultMap id="BaseResultMap" type="com.aek56.microservice.auth.entity.WxSysUser">
+		<id column="id" property="id" />
+		<result column="user_id" property="userId" />
+		<result column="password" property="password"/>
+		<result column="union_id" property="unionId" />
+		<result column="open_id" property="openId" />
+		<result column="mini_open_id" property="miniOpenId" />
+		<result column="create_time" property="createTime" />
+		<result column="enable" property="enable" />
+		<result column="wx_nick_name" property="wxNickName" />
+	</resultMap>
+	
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, user_id,password,union_id,open_id,mini_open_id,create_time,enable,wx_nick_name
+    </sql>
+    
+    <!-- 保存微信用户绑定关系 -->
+    <insert id="insertWxSysUser" parameterType="com.aek56.microservice.auth.entity.WxSysUser">
+    	insert into wx_sys_user(user_id,password,union_id,open_id,wx_nick_name,mini_open_id,create_time,enable) 
+    	values(#{wxSysUser.userId},#{wxSysUser.password},#{wxSysUser.unionId},#{wxSysUser.openId},#{wxSysUser.wxNickName},#{wxSysUser.miniOpenId},now(),#{wxSysUser.enable})
+    </insert>
+    
+    <!-- 更新微信用户绑定关系 -->
+    <update id="updateWxSysUser" parameterType="com.aek56.microservice.auth.entity.WxSysUser">
+    	update wx_sys_user
+    	<set>
+			<if test="wxSysUser.miniOpenId != null and  wxSysUser.miniOpenId !=''">
+				mini_open_id = #{wxSysUser.miniOpenId},
+			</if>
+			<if test="wxSysUser.unionId != null and  wxSysUser.unionId !=''">
+				union_id = #{wxSysUser.unionId},
+			</if>
+			<if test="wxSysUser.enable != null">
+				enable = #{wxSysUser.enable},
+			</if>
+			<if test="wxSysUser.wxNickName != null and  wxSysUser.wxNickName !=''">
+				wx_nick_name = #{wxSysUser.wxNickName},
+			</if>
+		</set>
+		where id = #{wxSysUser.id}
+    </update>
+
+    <!-- 查询OpenId绑定的用户记录 -->
+    <select id="countWxSysUser" resultType="int" parameterType="java.lang.String">
+    	select count(*) from wx_sys_user where open_id=#{openId}
+    </select>
+    
+    <!-- 查询OpenID绑定用户 -->
+    <select id="selectWxSysUserByOpenId" resultMap="BaseResultMap">
+    	select 
+    	<include refid="Base_Column_List"/>
+        from wx_sys_user where open_id=#{openId} limit 0,1
+    </select>
+    
+    <!-- 查询UnionID绑定用户 -->
+    <select id="selectWxSysUserByUnionId" resultMap="BaseResultMap">
+    	select 
+    	<include refid="Base_Column_List"/>
+        from wx_sys_user where union_id=#{unionId} limit 0,1
+    </select>
+    
+    <!-- 查询miniOpenId绑定用户 -->
+    <select id="selectWxSysUserByMiniOpenId" resultMap="BaseResultMap">
+    	select 
+    	<include refid="Base_Column_List"/>
+        from wx_sys_user where mini_open_id=#{miniOpenId} limit 0,1
+    </select>
+    
+    <!-- 查询OpenID绑定用户 -->
+    <select id="selectWxSysUserByUserId" resultMap="BaseResultMap">
+    	select 
+    	<include refid="Base_Column_List"/>
+        from wx_sys_user where user_id=#{userId} limit 0,1
+    </select>
+    
+</mapper>
